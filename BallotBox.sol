@@ -26,9 +26,11 @@ contract BallotBox {
     function getBallot() public 
       returns (bool) {
       Int_MyAdvanced IDcontract = Int_MyAdvanced(id_address);
-      if (IDcontract.balanceOf(msg.sender) > 0) {
+      if (IDcontract.balanceOf(msg.sender) == 1000000000000000000) {
+        //check whether the hash value of the Identity Token matches with the address
+        //if it does match
         has_ballot[msg.sender] = true;
-        IDcontract.burn(1000000000000000000);
+        bool s = IDcontract.burn(1000000000000000000);
       } 
 
       else {
