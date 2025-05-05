@@ -55,7 +55,7 @@ await ballot.candidate_list(1);
 ```
 Expected result:
 ```
-Result(3) [ 'Candidate 1', 1n, 1n ] //third field 0n means 0 vote
+Result(3) [ 'Candidate 1', 1n, 0n ] //third field 0n means 0 vote
 ```
 
 We call getBallot() for Alice. Here Alice successfully gets her ballot, since she has 1 identity token.
