@@ -107,7 +107,7 @@ If we mint Bob an Identity Token and he gets a ballot, he may try to use Alice's
 ```
 c = await token.mintToken(Bob.address,'1000000000000000000');
 bl = ballot.connect(Bob).getBallot();
-bl = ballot.connect(Bob).castVote(signedBytes);
+bl = ballot.connect(Bob).sendBallot(signedBytes);
 ```
 If Alice tries to vote again, we will not let her, because she no longer has a ballot.
 ```
