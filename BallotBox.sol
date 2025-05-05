@@ -26,7 +26,8 @@ contract BallotBox {
       uint number;
       uint numVotes;
     }
-
+    
+    //These data would only be visible by the Government (except for msgHash)
     mapping (uint => Candidate) public candidate_list;
     mapping (address => bool) public has_ballot;
     mapping (address => string) public votes;
@@ -46,8 +47,9 @@ contract BallotBox {
     }
 
     /*
-    This function reads the current vote count for a candidate.
-    Only the Government can use this function.
+    This pseudo-code function reads the current vote count for a candidate.
+    Only the Government can use this function. In our demo, we view the candidate_list directly, 
+    but in a real blockchain solution, we would make the contract variables on visible to the Government.
     */
     function getCandidateVotes(uint cand_num) onlyOwner public view returns (uint) {
       return candidate_list[cand_num].numVotes;
@@ -66,6 +68,7 @@ contract BallotBox {
         //check that the identity token matches the user (not implemented)
         has_ballot[msg.sender] = true;
         nonces[msg.sender] = 1; //initialize nonce
+        //we would ideally discard the identity token after one use
       } 
 
       else {
@@ -160,23 +163,22 @@ contract BallotBox {
     */
     function sendBallot(bytes memory signature) public
     {
-      require(has_ballot[msg.sender], "Not eligible to vote");
-      string memory cand_name = votes[msg.sender];
-      console.log(cand_name);
-      require(verify(msg.sender,votes[msg.sender], nonces[msg.sender], signature), "Signature rejected");
-      console.log("Requires success");
-      if (keccak256(abi.encodePacked(cand_name)) == 
+      require(has_ballot[msg.sender], "Not eligible to vote; no ballot");
+      require(verify(msg.sender,votes[msg.sender], nonces[msg.sender]-1, signature), "Signature rejected");
+      nonces[msg.sender]++;
+      if (keccak256(abi.encodePacked(votes[msg.sender])) == 
       (keccak256(abi.encodePacked(candidate_list[1].name)))) {
         candidate_list[1].numVotes++;
+        has_ballot[msg.sender] = false; //can't vote again
         return;
       }
 
-      else if (keccak256(abi.encodePacked(cand_name)) == 
+      else if (keccak256(abi.encodePacked(votes[msg.sender])) == 
       (keccak256(abi.encodePacked(candidate_list[2].name)))) {
+        has_ballot[msg.sender] = false; //can't vote again
         candidate_list[2].numVotes++;
         return;
       }
-      console.log("Added vote");
       require(false, "Not valid candidate");
     }
 }
