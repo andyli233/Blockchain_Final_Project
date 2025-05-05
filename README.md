@@ -46,10 +46,17 @@ Go back to the shell where the hardhat console is running. Convert the signature
 const signedHash = "0x1d8313d94ffc9e5fd4c911695c207f39871a187a504ebdd45146d495f1ad1fe22e18f0e20b2474f43c32f005b6208235d2465fdc80dc79dda317fa013ede8f9f1c"
 const signedBytes = ethers.getBytes(signedHash);
 ```
-
 Alice can now cast her vote with her signed ballot. Run the castVote function and pass signedBytes as the parameter.
 ```
 bl = ballot.connect(Alice).castVote(signedBytes);
+```
+Check the current vote count for Candidate 1. There should be 1 vote now. The number of votes is the third field of the Candidate struct.
+```
+await ballot.candidate_list(1);
+```
+Expected result:
+```
+Result(3) [ 'Candidate 1', 1n, 1n ] //third field 1n means 1 vote
 ```
 
 
