@@ -10,6 +10,8 @@ const { ethers } = require("hardhat"); //import the Hardhat 'ethers' plugin
 ```
 ```
 const IDToken  = await ethers.getContractFactory("MyAdvancedToken"); // Get the contract factory for the 'MyAdvancedToken' contract
+```
+```
 const token = await IDToken.deploy(0, "Voting token", "VT");//deploy contract
 ```
 ```
