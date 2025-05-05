@@ -47,6 +47,14 @@ const Ballot  = await ethers.getContractFactory("BallotBox");
 ```
 const ballot = await Ballot.deploy("Candidate 1","Candidate 2",token);
 ```
+Check the current vote count for Candidate 1. There should be 0 votes now. The number of votes is the third field of the Candidate struct.
+```
+await ballot.candidate_list(1);
+```
+Expected result:
+```
+Result(3) [ 'Candidate 1', 1n, 1n ] //third field 0n means 0 vote
+```
 
 We call getBallot() for Alice. Here Alice successfully gets her ballot, since she has 1 identity token.
 ```
@@ -85,7 +93,7 @@ const signedBytes = ethers.getBytes(signedHash);
 ```
 Alice can now cast her vote with her signed ballot. Run the castVote function and pass signedBytes as the parameter.
 ```
-bl = ballot.connect(Alice).castVote(signedBytes);
+bl = ballot.connect(Alice).sendBallot(signedBytes);
 ```
 Check the current vote count for Candidate 1. There should be 1 vote now. The number of votes is the third field of the Candidate struct.
 ```
@@ -95,5 +103,13 @@ Expected result:
 ```
 Result(3) [ 'Candidate 1', 1n, 1n ] //third field 1n means 1 vote
 ```
-
-
+If we mint Bob an Identity Token and he gets a ballot, he may try to use Alice's signature. In this case, we will reject his signature.
+```
+c = await token.mintToken(Bob.address,'1000000000000000000');
+bl = ballot.connect(Bob).getBallot();
+bl = ballot.connect(Bob).castVote(signedBytes);
+```
+If Alice tries to vote again, we will not let her, because she no longer has a ballot.
+```
+bl = ballot.connect(Alice).sendBallot(signedBytes);
+```
