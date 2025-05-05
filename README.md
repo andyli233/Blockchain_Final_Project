@@ -1,5 +1,30 @@
 # Blockchain_Final_Project
 
+Create a new Hardhat project. Upload the provided Solidity contracts to the contracts sub-directory and the signature.js file to a different sub-directory (we called it off-chain)
+
+Run the hardhat node in a shell and open a new shell. Run the hardhat console in this shell.
+
+# We will deploy the Identity Token Contract. For simplicity, we use the ERC20Token Contract from Lab 2 to simulate the Identity Token transactions.
+```
+const { ethers } = require("hardhat"); //import the Hardhat 'ethers' plugin
+```
+```
+const IDToken  = await ethers.getContractFactory("MyAdvancedToken"); // Get the contract factory for the 'MyAdvancedToken' contract
+const token = await IDToken.deploy(0, "Voting token", "VT");//deploy contract
+```
+```
+const [Government, Alice, Bob, Charlie] = await ethers.getSigners(); //Get 4 accounts from Hardhat. Government here is the owner.
+```
+```
+const aliceAddr = Alice.address; //Alice’s address is saved as aliceAddr
+```
+We will assume that Alice has verified her identity in person and will grant her an identity token.
+```
+c = await token.mintToken(aliceAddr,'1000000000000000000'); // mint 1 token to Alice Address (ie 10^18)
+```
+None of the other voters have Identity Tokens, so they cannot vote.
+
+
 # Next, we will deploy and run the Ballot Box contract. We will check if a voter is registered/eligible, allow them to fill out a ballot, and cast their signed vote. The vote signing will happen off-chain.
 
 Within the console, deploy the BallotBox contract with Candidate 1 and 2 and the address of the voting token
