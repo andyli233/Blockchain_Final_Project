@@ -24,6 +24,17 @@ c = await token.mintToken(aliceAddr,'1000000000000000000'); // mint 1 token to A
 ```
 None of the other voters have Identity Tokens, so they cannot vote.
 
+We add a function that verifies Alice on the contract after she has verified her identity in person and received a credential.
+If you want to use this function, repeat the above steps except giving an identity token using the IdentityToken_Verification.sol.
+When Alice verifies her identity in person, she receives a credential, and the government adds this credential to the contract.
+```
+c = await token.addValidCredential("123456");
+```
+Alice can use her credential to get the identity token.
+```
+c = await token.connect(Alice).getIdentityToken("123456");
+```
+
 
 # Next, we will deploy and run the Ballot Box contract. We will check if a voter is registered/eligible, allow them to fill out a ballot, and cast their signed vote. The vote signing will happen off-chain.
 
