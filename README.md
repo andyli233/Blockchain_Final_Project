@@ -4,6 +4,8 @@
 
 Within the console, deploy the BallotBox contract with Candidate 1 and 2 and the address of the voting token
 
-'''const Ballot  = await ethers.getContractFactory("BallotBox");'''
+'''
+const Ballot  = await ethers.getContractFactory("BallotBox");
+'''
 '''const ballot = await Ballot.deploy("Candidate 1","Candidate 2",token);'''
 
