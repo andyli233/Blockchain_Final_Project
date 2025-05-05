@@ -49,7 +49,7 @@ const signedBytes = ethers.getBytes(signedHash);
 
 Alice can now cast her vote with her signed ballot. Run the castVote function and pass signedBytes as the parameter.
 ```
-bl = ballot.connect(Alice).castVote(SB);
+bl = ballot.connect(Alice).castVote(signedBytes);
 ```
 
 
