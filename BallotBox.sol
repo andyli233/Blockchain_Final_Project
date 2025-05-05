@@ -5,7 +5,18 @@ interface Int_MyAdvanced {
   function burn(uint256 _value) external view returns (bool success);
 }
 
+
 contract BallotBox {
+
+    address public owner;
+
+    // Add this modifier to restrict function execution
+    // to only the current owner.
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
 
     uint numCandidates;
     address public id_address;
@@ -23,20 +34,38 @@ contract BallotBox {
     mapping (address => uint) public nonces;
 
     constructor(string memory c1, string memory c2, address ID) public {
+      //initialize each candidate to have 0 votes
       candidate_list[1] = Candidate(c1, 1, 0);
       candidate_list[2] = Candidate(c2, 2, 0);
+
+      //address of the identity token contract
       id_address = ID;
+
+      //the government deployed the contract, so it is the owner
+      owner = msg.sender;
     }
 
-    
+    /*
+    This function reads the current vote count for a candidate.
+    Only the Government can use this function.
+    */
+    function getCandidateVotes(uint cand_num) onlyOwner public view returns (uint) {
+      return candidate_list[cand_num].numVotes;
+    }
+
+    /*
+    This function is where users show their identity token if they have it.
+    The fillBallot and sendBallot functions cannot be executed without getting a Ballot first.
+    */
     function getBallot() public 
       returns (bool) {
       Int_MyAdvanced IDcontract = Int_MyAdvanced(id_address);
+      
+      //check if they have an identity token
       if (IDcontract.balanceOf(msg.sender) == 1000000000000000000) {
-        //check whether the hash value of the Identity Token matches with the address
-        //if it does match
+        //check that the identity token matches the user (not implemented)
         has_ballot[msg.sender] = true;
-        nonces[msg.sender] = 1;
+        nonces[msg.sender] = 1; //initialize nonce
       } 
 
       else {
@@ -49,13 +78,26 @@ contract BallotBox {
     
     function fillBallot(string memory cand_name) public returns (bytes32)
     {
-      console.log("Nonce: %d", nonces[msg.sender]);
-      votes[msg.sender] = cand_name;
+      require(has_ballot[msg.sender], "You don't have a ballot!");
+      votes[msg.sender] = cand_name; //store candidate choice to be used later
+
+      //The voter must hash their message with the nonce before signing
       msgHash[msg.sender] = keccak256(abi.encodePacked(cand_name, nonces[msg.sender]));
-      //the voter will then sign their vote off-chain
+      nonces[msg.sender]++; //we increment the nonce to prevent replay attacks
     }
 
+    /*
+    SIGNATURE STEP: THE VOTER WILL SIGN THEIR BALLOT
+        WITH THEIR PRIVATE KEY OFF-CHAIN 
+    */
 
+    /*
+    After signing, the user will send their ballot to the blockchain.
+    We must verify the signature before counting the vote.
+
+    The following signature verification helper functions 
+    are from https://solidity-by-example.org/signature/
+    */
     function verify(
         address _signer,
         string memory _cand_name,
@@ -108,11 +150,15 @@ contract BallotBox {
             // final byte (first byte of the next 32 bytes)
             v := byte(0, mload(add(sig, 96)))
         }
-
-        // implicitly return (r, s, v)
     }
 
-    function castVote(bytes memory signature) public
+
+    /* 
+    Finally, the voter sends their ballot to the Government.
+    We verify that the signed message came from the right address.
+    If the signature is valid, we add the vote to the intended candidate's voteCount
+    */
+    function sendBallot(bytes memory signature) public
     {
       require(has_ballot[msg.sender], "Not eligible to vote");
       string memory cand_name = votes[msg.sender];
