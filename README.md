@@ -53,9 +53,9 @@ We call getBallot() for Alice. Here Alice successfully gets her ballot, since sh
 bl = ballot.connect(Alice).getBallot();
 ```
 
-We call getBallot() for Bob. Since Bob does not have an identity token, he does not get a ballot.
+We call getBallot() for Bob. Since Bob does not have an identity token, he does not get a ballot (gets an error message)
 ```
-bl = ballot.connect(Alice).getBallot();
+bl = ballot.connect(Bob).getBallot();
 ```
 
 Next, Alice fills out her ballot with her vote for Candidate 1.
