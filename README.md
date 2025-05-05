@@ -26,6 +26,7 @@ None of the other voters have Identity Tokens, so they cannot vote.
 
 We add a function that verifies Alice on the contract after she has verified her identity in person and received a credential.
 If you want to use this function, repeat the above steps except giving an identity token using the IdentityToken_Verification.sol.
+
 When Alice verifies her identity in person, she receives a credential, and the government adds this credential to the contract.
 ```
 c = await token.addValidCredential("123456");
